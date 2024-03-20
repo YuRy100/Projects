@@ -1,0 +1,173 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Chtas113
+{
+    class Moves
+    {
+        FigureMoving fm;
+        Board board;
+        public Moves (Board board)
+        {
+            this.board = board;
+        }
+        public bool CanMove(FigureMoving fm)
+        {
+            this.fm = fm;
+            return
+                CanMoveFrom() && ((board.GetFigureAt(fm.to).GetColor()!=board.moveColor)&&(board.GetFigureAt(fm.to)!= Figure.none) ? CanAttack(): CanFigureMove()) &&
+                CanMoveTo() && CorrectFigure() && asleep();
+        }
+        bool CorrectFigure()
+        {
+            return board.GetFigureAt(fm.from) != Figure.none && fm.figure == board.GetFigureAt(fm.from);
+        }
+        public bool CanAttack()
+        {
+            if (fm.figure.IsWarrior()) return CanFigureMove();
+            switch (fm.figure)
+            {
+                case Figure.whiteArcher:
+                case Figure.blackArcher:
+                    return CanStraightMove(2) && (fm.AbsDeltaX == 0 || fm.AbsDeltaY == 0);
+                case Figure.whiteAssasin:
+                case Figure.blackAssasin:
+                    return CanMoveOneStep();
+                case Figure.whiteArcherArcher:
+                case Figure.blackArcherArcher:
+                    return CanStraightMove(4) && (fm.AbsDeltaX == 0 || fm.AbsDeltaY == 0);
+                case Figure.whiteAssasinAssasin:
+                case Figure.blackAssasinAssasin:
+                    return WarriorWarriorWarriorCanMove();
+                case Figure.whiteArcherAssasin:
+                case Figure.blackArcherAssasin:
+                    return CanStraightMove(2) && (fm.AbsDeltaX == 0 || fm.AbsDeltaY == 0);
+                case Figure.whiteArcherArcherArcher:
+                case Figure.blackArcherArcherArcher:
+                    return CanStraightMove(100) && (fm.AbsDeltaX == 0 || fm.AbsDeltaY == 0);
+                case Figure.whiteAssasinAssasinAssasin:
+                case Figure.blackAssasinAssasinAssasin:
+                    return CanStraightMove(2);
+                case Figure.whiteArcherAssasinAssasin:
+                case Figure.blackArcherAssasinAssasin:
+                    return CanStraightMove(3);
+                case Figure.whiteArcherArcherAssasin:
+                case Figure.blackArcherArcherAssasin:
+                    return CanStraightMove(4);
+                case Figure.whiteWarriorWarriorArcher:
+                case Figure.blackWarriorWarriorArcher:
+                    return CanStraightMove(4) && (fm.AbsDeltaX == 0 || fm.AbsDeltaY == 0);
+                case Figure.whiteWarriorArcherArcher:
+                case Figure.blackWarriorArcherArcher:
+                    return fm.AbsDeltaY <= 2;
+                default: return false;
+            }
+        }
+        bool CanMoveFrom()
+        {
+            return fm.from.OnBoard() &&
+                fm.figure.GetColor() == board.moveColor; 
+        }
+        bool CanMoveTo()
+        {
+            return fm.to.OnBoard();
+        }
+        public bool CanFigureMove()
+        {
+            switch (fm.figure)
+            {
+                case Figure.whiteWarrior:
+                case Figure.blackWarrior:
+                    return CanMoveOneStep();
+                case Figure.whiteArcher:
+                case Figure.blackArcher:
+                    return CanMoveOneStep();
+                case Figure.whiteAssasin: 
+                case Figure.blackAssasin:
+                    return CanStraightMove(2)&&(fm.AbsDeltaX==0 || fm.AbsDeltaY==0);
+                case Figure.whiteWarriorWarrior:
+                case Figure.blackWarriorWarrior:
+                    return CanMoveOneStep();
+                case Figure.whiteArcherArcher:
+                case Figure.blackArcherArcher:
+                    return CanMoveOneStep();
+                case Figure.whiteAssasinAssasin:
+                case Figure.blackAssasinAssasin:
+                    return CanStraightMove(2);
+                case Figure.whiteWarriorArcher:
+                case Figure.blackWarriorArcher:
+                    return CanMoveOneStep();
+                case Figure.whiteWarriorAssasin:
+                case Figure.blackWarriorAssasin:
+                    return CanStraightMove(2) && (fm.AbsDeltaX == 0 || fm.AbsDeltaY == 0);
+                case Figure.whiteArcherAssasin:
+                case Figure.blackArcherAssasin:
+                    return CanStraightMove(2) && (fm.AbsDeltaX == 0 || fm.AbsDeltaY == 0);
+                case Figure.whiteWarriorArcherAssasin:
+                case Figure.blackWarriorArcherAssasin:
+                    return CanStraightMove(2);
+                case Figure.whiteWarriorWarriorWarrior:
+                case Figure.blackWarriorWarriorWarrior:
+                    return WarriorWarriorWarriorCanMove();
+                case Figure.whiteArcherArcherArcher:
+                case Figure.blackArcherArcherArcher:
+                    return CanMoveOneStep();
+                case Figure.whiteAssasinAssasinAssasin:
+                case Figure.blackAssasinAssasinAssasin:
+                    return CanStraightMove(3);
+                case Figure.whiteWarriorArcherArcher:
+                case Figure.blackWarriorArcherArcher:
+                    return CanStraightMove(2) && (fm.AbsDeltaX == 0 || fm.AbsDeltaY == 0);
+                case Figure.whiteWarriorAssasinAssasin:
+                case Figure.blackWarriorAssasinAssasin:
+                    return CanStraightMove(2) || CanWarriorAssasinAssasinMove();
+                case Figure.whiteWarriorWarriorAssasin:
+                case Figure.blackWarriorWarriorAssasin:
+                    return CanStraightMove(2);
+                case Figure.whiteWarriorWarriorArcher:
+                case Figure.blackWarriorWarriorArcher:
+                    return CanStraightMove(2) && (fm.AbsDeltaX == 0 || fm.AbsDeltaY == 0); ;
+                case Figure.whiteArcherAssasinAssasin:
+                case Figure.blackArcherAssasinAssasin:
+                    return CanStraightMove(3);
+                case Figure.whiteArcherArcherAssasin:
+                case Figure.blackArcherArcherAssasin:
+                    return CanMoveOneStep();
+                default: return false;
+            }
+        }
+        public bool CanWarriorAssasinAssasinMove()
+        {
+            return board.GetFigureAt(fm.to).GetColor() == board.moveColor;
+        }
+        public bool asleep()
+        {
+            return board.moveNumber-3 - board.number(fm.from)> 0;
+
+        }
+        public bool CanMoveOneStep()
+        {
+            return (fm.AbsDeltaX ==1 && fm.AbsDeltaY == 0) || (fm.AbsDeltaY == 1 && fm.AbsDeltaX == 0);
+        }
+        public bool WarriorWarriorWarriorCanMove()
+        {
+            return fm.AbsDeltaX == 1 || fm.AbsDeltaY == 1;
+        }
+        public bool CanStraightMove(int t)
+        {
+            Square at = fm.from;
+            int counter = 0;
+            do
+            {
+                at = new Square(at.x + fm.SignX, at.y + fm.SignY);
+                counter++;
+                if (Square.Eql(at, fm.to))
+                    return true;
+            } while (at.OnBoard() && board.GetFigureAt(at)==Figure.none && counter!=t);
+            return false;
+        }
+    }
+}
