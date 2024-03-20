@@ -1,0 +1,25 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Chtas113
+{
+    class FigureSet
+    {
+        public Figure figure { get; private set; }
+        public Square to { get; private set; }
+
+        public FigureSet(FigureOnSquare fs)
+        {
+            this.figure = fs.figure;
+            this.to = fs.square;
+        }
+        public FigureSet(string move)
+        {
+            this.figure = (Figure)move[0];
+            this.to = new Square(move.Substring(1, 2));
+        }
+    }
+}
