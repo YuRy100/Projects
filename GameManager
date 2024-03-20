@@ -1,0 +1,228 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using Chtas113;
+using System;
+using System.Threading;
+public class Rules : MonoBehaviour
+{
+    DragAndDrop dad;
+    Chtas113.Chtas113 chtas113;
+    public int count;
+    Board board;
+    public Chtas113.Chtas113 chtas114 { get; private set; }
+    public Rules()
+    {
+        dad = new DragAndDrop();
+        chtas113 = new Chtas113.Chtas113();
+    }
+    void ButClick()
+    {
+        count = 1;
+    }
+    void Start()
+    {
+        string[] parts = chtas113.fen.Split();
+        if (parts[1] == "w" && (int.Parse(parts[2]) % 3 == 1))
+        {
+            PlaceFigure("box115", "W", 12, 15);
+            PlaceFigure("box116", "R", 12, 16);
+            PlaceFigure("box117", "A", 12, 17);
+        }
+        else if (parts[1] == "b" && (int.Parse(parts[2]) % 3 == 1))
+        {
+            PlaceFigure("box115", "w", 12, 15);
+            PlaceFigure("box116", "r", 12, 16);
+            PlaceFigure("box117", "a", 12, 17);
+        }
+        ShowFigures();
+    }
+    void Update()
+    {
+        if (dad.Action() || count==1)
+        {
+            string from = GetSquare(dad.pickPosition);
+            string to = GetSquare(dad.dropPosition);
+            int x = from[0] - 49;
+            int y = from[1] - 'a';
+            string figure = "";
+            string[] parts = chtas113.fen.Split();
+            if (int.Parse(parts[2]) % 3 == 1)
+                figure = TrFigure();
+            else
+                figure = (chtas113.GetFigureAt(x, y)).ToString();
+            string move = "";
+            if (int.Parse(parts[2]) % 3 == 1)
+            {
+                move = figure + to;
+            }
+            else
+                move = figure + from + to;
+            Debug.Log(move);
+            chtas113 = chtas113.Move(move);
+            if (count == 1)
+            {
+                chtas113 = new Chtas113.Chtas113("9/9/9/9/9/9/9/9/9/9/9/9 w 1", "000000000/000000000/000000000/000000000/000000000/000000000/000000000/000000000/000000000/000000000/000000000/000000000");
+                count = 0;
+            }
+            ShowFigures();
+        }
+    }
+    string GetSquare(Vector2 position)
+    {
+        int x = Convert.ToInt32(position.x / 2.0);
+        int y = Convert.ToInt32(position.y / 2.0);
+        return (x + 1).ToString() + ((char)('a' + y)).ToString();
+    }
+    public void ShowFigures()
+    {
+        int nr = 0;
+        string[] parts = chtas113.fen.Split();
+        for (int x = 0; x < 9; x++)
+        {
+            for (int y = 0; y < 12; y++)
+            {
+                string figure = chtas113.GetFigureAt(x, y).ToString();
+                if (figure == ".") continue;
+                PlaceFigure("box" + nr, figure, y, x);
+                nr++;
+            }
+            if (parts[1] == "w" && (int.Parse(parts[2]) % 3 == 1))
+            {
+                PlaceFigure("box115", "W", 12, 15);
+                PlaceFigure("box116", "R", 12, 16);
+                PlaceFigure("box117", "A", 12, 17);
+            }
+            else if (parts[1] == "b" && (int.Parse(parts[2]) % 3 == 1))
+            {
+                PlaceFigure("box115", "w", 12, 15);
+                PlaceFigure("box116", "r", 12, 16);
+                PlaceFigure("box117", "a", 12, 17);
+            }
+        }
+        for (; nr < 54; nr++)
+        {
+            PlaceFigure("box" + nr, "L", 10, 13);
+        }
+    }
+    void PlaceFigure(string box, string figure, int x, int y)
+    {
+        GameObject goBox = GameObject.Find(box);
+        GameObject goFigure = GameObject.Find(figure);
+        GameObject goSquare = GameObject.Find("" + x + y);
+        var spriteFigure = goFigure.GetComponent<SpriteRenderer>();
+        var spriteBox = goBox.GetComponent<SpriteRenderer>();
+        spriteBox.sprite = spriteFigure.sprite;
+        goBox.transform.position = goSquare.transform.position;
+    }
+    string TrFigure()
+    {
+        string[] parts = chtas113.fen.Split();
+        Debug.Log(dad.pickPosition.x);
+        Debug.Log(dad.pickPosition.y);
+        PlaceFigure("box115", "W", 10, 13);
+        PlaceFigure("box116", "R", 10, 13);
+        PlaceFigure("box117", "A", 10, 13);
+        if (parts[1] == "w")
+        {
+            if (dad.pickPosition.x >= 25.1 && dad.pickPosition.x <= 25.5 && dad.pickPosition.y >= 12.02 && dad.pickPosition.y <= 12.3)
+                return "W";
+            if (dad.pickPosition.x >= 25.1 && dad.pickPosition.x <= 25.5 && dad.pickPosition.y >= 8.74 && dad.pickPosition.y <= 9.0)
+                return "R";
+            if (dad.pickPosition.x >= 25.1 && dad.pickPosition.x <= 25.5 && dad.pickPosition.y >= 5.7 && dad.pickPosition.y <= 6.0)
+                return "A";
+        }
+        else if (parts[1] == "b")
+        {
+            if (dad.pickPosition.x >= 25.1 && dad.pickPosition.x <= 25.5 && dad.pickPosition.y >= 12.02 && dad.pickPosition.y <= 12.3)
+                return "w";
+            if (dad.pickPosition.x >= 25.1 && dad.pickPosition.x <= 25.5 && dad.pickPosition.y >= 8.74 && dad.pickPosition.y <= 9.0)
+                return "r";
+            if (dad.pickPosition.x >= 25.1 && dad.pickPosition.x <= 25.5 && dad.pickPosition.y >= 5.7 && dad.pickPosition.y <= 6.0)
+                return "a";
+        }
+        return "1";
+    }
+    public void SkipMove()
+    {
+
+    }
+}
+class DragAndDrop
+{
+    enum State
+    {
+        none,
+        drag,
+    }
+    public Vector2 pickPosition { get; private set; }
+    public Vector2 dropPosition { get; private set; }
+    State state;
+    GameObject item;
+    Vector2 offset;
+
+    public DragAndDrop()
+    {
+        state = State.none;
+        item = null;
+    }
+
+    public bool Action()
+    {
+        switch (state)
+        {
+            case State.none:
+                if (IsMouseButtonPressed())
+                    PickUp();
+                break;
+            case State.drag:
+                if (IsMouseButtonPressed())
+                    Drag();
+                else
+                {
+                    Drop();
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
+    bool IsMouseButtonPressed()
+    {
+        return Input.GetMouseButton(0);
+    }
+    void PickUp()
+    {
+        Vector2 clickPosition = GetClickPosition();
+        Transform clickedItem = GetItemAt(clickPosition);
+        if (clickedItem == null) return;
+        pickPosition = clickedItem.position;
+        item = clickedItem.gameObject;
+        state = State.drag;
+        offset = pickPosition - clickPosition;
+    }
+    public Vector2 GetClickPosition()
+    {
+        return Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    }
+    Transform GetItemAt(Vector2 position)
+    {
+        RaycastHit2D[] figures = Physics2D.RaycastAll(position, position, 0.5f);
+        if (figures.Length == 0)
+        {
+            return null;
+        }
+        return figures[0].transform;
+    }
+    void Drag()
+    {
+        item.transform.position = GetClickPosition() + offset;
+    }
+    void Drop()
+    {
+        dropPosition = item.transform.position;
+        state = State.none;
+        item = null;
+    }
+}
