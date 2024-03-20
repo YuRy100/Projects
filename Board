@@ -1,0 +1,214 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Chtas113
+{
+    class Board
+    {
+        public string fen { get; private set; }
+        public string fen1 { get; private set; }
+        Figure[,] figures;
+        public int[,] numbers;
+        public int count = 0;
+        public Color moveColor { get; private set; }
+        public int moveNumber { get; private set; }
+        public Board(string fen,string fen1)
+        {
+            this.fen = fen;
+            this.fen1 = fen1;
+            figures = new Figure[9, 12];
+            numbers = new int[9, 12];
+            Init();
+        }
+        void Init()
+        {
+            string []parts=fen.Split();
+            if (parts.Length != 3) return;
+            InitFen1(fen1);
+            InitFigures(parts[0]);
+            moveColor = parts[1] == "b"? Color.black : Color.white;
+            moveNumber = int.Parse(parts[2]);
+        }
+        void InitFigures(string data)
+        {
+            for(int j = 9; j >= 2; j--)
+            {
+                data = data.Replace((j).ToString(), (j - 1).ToString() + '1');
+            }
+            data = data.Replace('1', '.');
+            string[] lines = data.Split('/');
+            for (int y = 11; y >= 0; y--)
+                for (int x = 0; x < 9; x++)
+                    figures[x, y] = lines[11 - y][x] =='.'? Figure.none : (Figure)lines[11 - y][x];
+        }
+        void InitFen1(string data)
+        {
+            string[] lines = data.Split('/');
+            for (int y = 11; y >= 0; y--)
+                for (int x = 0; x < 9; x++)
+                    numbers[x, y] = lines[11 - y][x];
+        }
+        public IEnumerable<FigureOnSquare> YieldFigures()
+        {
+            foreach(Square square in Square.YieldSquares())
+            {
+                if (GetFigureAt(square).GetColor() == moveColor)
+                {
+                    yield return new FigureOnSquare(GetFigureAt(square), square);
+                }
+            }
+        }
+        void GenerateFEN()
+        {
+            fen= FenFigures() + " " +
+                (moveColor==Color.white? "w" : "b") + " " + moveNumber.ToString();
+            fen1 = FenNumbers();
+
+        }
+        string FenNumbers()
+        {
+            string data="";
+            for (int y = 11; y >= 0; y--)
+            {
+                for (int x = 0; x < 9; x++)
+                    data+=((char)numbers[x,y]);
+                if (y > 0)
+                    data+=('/');
+            }
+            return data;
+        }
+        string FenFigures()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int y = 11; y >= 0; y--)
+            {
+                for (int x = 0; x < 9; x++)
+                    sb.Append(figures[x, y] == Figure.none ? '1' : (char)figures[x, y]);
+                if (y > 0)
+                    sb.Append('/');
+            }
+            string nine ="111111111";
+            for (int j = 9; j >= 2; j--)
+                sb.Replace(nine.Substring(0, j), j.ToString());
+            return sb.ToString();
+        }
+        public Figure GetFigureAt(Square square)
+        {
+            if (square.OnBoard())
+                return figures[square.x, square.y];
+            return Figure.none;
+        }
+        void SetFigureAt(Square square,Figure figure)
+        {
+            
+            if (square.OnBoard())
+            {
+                if (figure != Figure.none)
+                {
+                    if (GetFigureAt(square) != Figure.none && GetFigureAt(square).GetColor() == moveColor)
+                    {
+                        numbers[square.x, square.y] = moveNumber - 5;
+                    }
+                    else
+                    {
+                        numbers[square.x, square.y] = moveNumber + 1;
+                    }
+                }
+                figures[square.x, square.y] = figure;
+            }
+        }
+        public int number(Square square)
+        {
+            return numbers[square.x, square.y];
+        }
+        public Board Move(FigureMoving fm,FigureSet fg)
+        {
+
+            Board next = new Board(fen,fen1);
+            if (moveNumber % 3 == 1)
+            {
+                if (GetFigureAt(fg.to) == Figure.none)
+                {
+                    next.SetFigureAt(fg.to, fg.figure);
+                }
+                else if (GetFigureAt(fg.to).Power() < 3 && GetFigureAt(fg.to).GetColor() == moveColor) {
+                    Figure figure2 = GetFigureAt(fg.to).Promotion(fg.figure);
+                    next.SetFigureAt(fg.to, figure2);
+                    
+                }
+            }
+            if (moveNumber % 3 == 2 || moveNumber % 3 == 0)
+            {
+                if ((fm.figure == Figure.whiteWarriorAssasinAssasin || fm.figure == Figure.blackWarriorAssasinAssasin) && GetFigureAt(fm.to).GetColor() == moveColor)
+                {
+                    next.SetFigureAt(fm.from, GetFigureAt(fm.to));
+                    next.SetFigureAt(fm.to, fm.figure);
+                    numbers[fm.from.x, fm.from.y] = 2;
+                }
+                else if (GetFigureAt(fm.to) != Figure.none && GetFigureAt(fm.to).GetColor() != moveColor)
+                {
+                    if (fm.figure.IsWarrior())
+                    {
+                        next.SetFigureAt(fm.to, fm.figure);
+                        next.SetFigureAt(fm.from, Figure.none);
+                    }
+                    else next.SetFigureAt(fm.to, Figure.none);
+                    if (fm.figure == Figure.whiteWarriorWarriorArcher || fm.figure == Figure.blackWarriorWarriorArcher)
+                    {
+                        if (moveColor == Color.black)
+                            next.SetFigureAt(fm.to, Figure.blackWarrior);
+                        else if (moveColor == Color.white)
+                            next.SetFigureAt(fm.to, Figure.whiteWarrior);
+                        next.SetFigureAt(fm.from, fm.figure);
+                    }
+                    else if (fm.figure == Figure.whiteWarriorWarriorAssasin || fm.figure == Figure.blackWarriorWarriorAssasin)
+                    {
+                        for (int i = -1; i <= 1; i++)
+                        {
+                            for (int j = -1; j <= 1; j++)
+                            {
+                                if (fm.to.x + i >= 0 && fm.to.x + i < 8 && fm.to.y + j >= 0 && fm.to.y + j <= 11)
+                                    if (figures[fm.to.x + i, fm.to.y + j].GetColor() != moveColor)
+                                        next.figures[fm.to.x + i, fm.to.y + j] = Figure.none;
+                            }
+                        }
+                        next.SetFigureAt(fm.to, fm.figure);
+                    }
+                    else if (fm.figure == Figure.whiteArcherArcherAssasin || fm.figure == Figure.blackArcherArcherAssasin)
+                    {
+                        next.SetFigureAt(fm.to, Figure.none);
+                        next.figures[fm.from.x + (fm.DeltaX - 1) * fm.SignX, fm.from.y + (fm.DeltaY - 1) * fm.SignY] = fm.figure;
+                        next.numbers[fm.from.x + (fm.DeltaX - 1) * fm.SignX, fm.from.y + (fm.DeltaY - 1) * fm.SignY] = moveNumber + 1;
+                        next.SetFigureAt(fm.from, Figure.none);
+                    }
+                }
+                else if (GetFigureAt(fm.to) == Figure.none)
+                {
+                    next.SetFigureAt(fm.from, Figure.none);
+                    next.SetFigureAt(fm.to, fm.promotion == Figure.none ? fm.figure : fm.promotion);
+                }
+                else if (GetFigureAt(fm.to).GetColor() != moveColor)
+                {
+                    next.SetFigureAt(fm.to, Figure.none);
+                }
+                else if (GetFigureAt(fm.to).Power() + fm.figure.Power()<= 3 && GetFigureAt(fm.to).GetColor()==moveColor)
+                {
+                    Figure figure2 = GetFigureAt(fm.to).Promotion(fm.figure);
+                    next.SetFigureAt(fm.from, Figure.none);
+                    next.SetFigureAt(fm.to, figure2);
+                    
+                }
+            }
+            if (moveNumber % 3 == 0)
+            {
+                next.moveColor = moveColor.FlipColor(); 
+            }
+            next.moveNumber++;
+            next.GenerateFEN();
+            return next;
+        }
+    }
+}
