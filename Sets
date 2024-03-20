@@ -1,0 +1,44 @@
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Chtas113
+{
+    class Sets
+    {
+        FigureSet fg;
+        Board board;
+        public Sets (Board board)
+        {
+            this.board = board;
+        }
+        public bool CanSet(FigureSet fg)
+        {
+            this.fg = fg;
+            return fg.figure.Power() == 1 && SetMove() && CanSetOn(fg.to) && CanSetOn2(fg.to);
+        }
+        bool SetMove()
+        {
+            return fg.figure.GetColor() == board.moveColor && board.moveNumber%3==1;
+        }
+        bool CanSetOn(Square square)
+        {
+            int x = square.x+1;
+            int y = square.y+1;
+            return (x == 3 && (y == 2) && board.moveColor == Color.white) ||
+                   (x == 5 && (y == 2) && board.moveColor == Color.white) ||
+                   (x == 7 && (y == 2) && board.moveColor == Color.white) ||
+                   (x == 4 && (y == 4) && board.moveColor == Color.white) ||
+                   (x == 6 && (y == 4) && board.moveColor == Color.white) ||
+                   (x == 3 && (y == 11) && board.moveColor == Color.black) ||
+                   (x == 5 && (y == 11) && board.moveColor == Color.black) ||
+                   (x == 7 && (y == 11) && board.moveColor == Color.black) ||
+                   (x == 4 && (y == 9) && board.moveColor == Color.black) ||
+                   (x == 6 && (y == 9) && board.moveColor == Color.black);
+        }
+        bool CanSetOn2(Square square)
+        {
+            return board.GetFigureAt(square) == Figure.none || (board.GetFigureAt(square).Power() < 3 && board.GetFigureAt(square).GetColor()==board.moveColor);
+        }
+    }
+}
