@@ -1,0 +1,285 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Chtas113
+{
+    enum Figure
+    {
+        none,
+        whiteWarrior= 'W',
+        whiteArcher = 'R',
+        whiteAssasin = 'A',
+        whiteWarriorWarrior='V',
+        whiteArcherArcher='I',
+        whiteAssasinAssasin='S',
+        whiteWarriorArcher= 'Q',
+        whiteWarriorAssasin='E',
+        whiteArcherAssasin='T',
+        whiteWarriorArcherAssasin='Y',
+        whiteWarriorWarriorWarrior='U',
+        whiteArcherArcherArcher='O',
+        whiteAssasinAssasinAssasin='D',
+        whiteWarriorArcherArcher='F',
+        whiteWarriorAssasinAssasin='G',
+        whiteWarriorWarriorAssasin='J',
+        whiteWarriorWarriorArcher='K',
+        whiteArcherAssasinAssasin='H',
+        whiteArcherArcherAssasin='L',
+        blackWarrior = 'w',
+        blackArcher = 'r',
+        blackAssasin = 'a',
+        blackWarriorWarrior = 'v',
+        blackArcherArcher = 'i',
+        blackAssasinAssasin = 's',
+        blackWarriorArcher = 'q',
+        blackWarriorAssasin = 'e',
+        blackArcherAssasin = 't',
+        blackWarriorArcherAssasin = 'y',
+        blackWarriorWarriorWarrior = 'u',
+        blackArcherArcherArcher = 'o',
+        blackAssasinAssasinAssasin = 'd',
+        blackWarriorArcherArcher = 'f',
+        blackWarriorAssasinAssasin = 'g',
+        blackWarriorWarriorAssasin = 'j',
+        blackWarriorWarriorArcher = 'k',
+        blackArcherAssasinAssasin = 'h',
+        blackArcherArcherAssasin = 'l',
+    }
+    static class FigureMethods
+    {
+        public static Color GetColor(this Figure figure)
+        {
+            if (figure == Figure.none)
+            {
+                return Color.none;
+            }
+            return (figure == Figure.whiteWarrior ||
+                    figure == Figure.whiteArcher ||
+                    figure == Figure.whiteAssasin ||
+                    figure == Figure.whiteWarriorWarrior ||
+                    figure == Figure.whiteArcherArcher ||
+                    figure == Figure.whiteAssasinAssasin ||
+                    figure == Figure.whiteWarriorArcher ||
+                    figure == Figure.whiteWarriorAssasin ||
+                    figure == Figure.whiteArcherAssasin ||
+                    figure == Figure.whiteWarriorArcherAssasin ||
+                    figure == Figure.whiteWarriorWarriorWarrior ||
+                    figure == Figure.whiteArcherArcherArcher ||
+                    figure == Figure.whiteAssasinAssasinAssasin ||
+                    figure == Figure.whiteWarriorArcherArcher ||
+                    figure == Figure.whiteWarriorAssasinAssasin ||
+                    figure == Figure.whiteWarriorWarriorAssasin ||
+                    figure == Figure.whiteWarriorWarriorArcher ||
+                    figure == Figure.whiteArcherAssasinAssasin ||
+                    figure == Figure.whiteArcherArcherAssasin) ? Color.white : Color.black;
+        }
+        public static bool IsWarrior(this Figure figure)
+        {
+            return figure == Figure.whiteWarrior ||
+                   figure == Figure.whiteWarriorWarrior ||
+                   figure == Figure.whiteWarriorArcher ||
+                   figure == Figure.whiteWarriorAssasin ||
+                   figure == Figure.whiteWarriorArcherAssasin ||
+                   figure == Figure.whiteWarriorWarriorWarrior ||
+                   figure == Figure.whiteWarriorAssasinAssasin ||
+                   figure == Figure.whiteWarriorWarriorAssasin ||
+                   figure == Figure.blackWarrior ||
+                   figure == Figure.blackWarriorWarrior ||
+                   figure == Figure.blackWarriorArcher ||
+                   figure == Figure.blackWarriorAssasin ||
+                   figure == Figure.blackWarriorArcherAssasin ||
+                   figure == Figure.blackWarriorWarriorWarrior ||
+                   figure == Figure.blackWarriorAssasinAssasin ||
+                   figure == Figure.blackWarriorWarriorAssasin;
+
+        }
+        public static int Power(this Figure figure)
+        {
+            if (figure == Figure.none) return 0;
+            if(figure == Figure.whiteWarrior ||
+               figure == Figure.whiteArcher ||
+               figure == Figure.whiteAssasin ||
+               figure == Figure.blackWarrior ||
+               figure == Figure.blackArcher ||
+               figure == Figure.blackAssasin)
+            {
+                return 1;
+            }
+            if(figure == Figure.whiteWarriorWarrior ||
+               figure == Figure.whiteArcherArcher ||
+               figure == Figure.whiteAssasinAssasin ||
+               figure == Figure.whiteWarriorArcher ||
+               figure == Figure.whiteWarriorAssasin ||
+               figure == Figure.whiteArcherAssasin ||
+               figure == Figure.blackWarriorWarrior ||
+               figure == Figure.blackArcherArcher ||
+               figure == Figure.blackAssasinAssasin ||
+               figure == Figure.blackWarriorArcher ||
+               figure == Figure.blackWarriorAssasin ||
+               figure == Figure.blackArcherAssasin)
+            {
+                return 2;
+            }
+            return 3;
+        }
+        public static Figure Promotion(this Figure figure, Figure figure2)
+        {
+            if (figure.GetColor() == Color.white && figure2.GetColor()==Color.white)
+            {
+                if (figure == Figure.whiteWarrior && figure2 == Figure.whiteWarrior)
+                {
+                    return Figure.whiteWarriorWarrior;
+                }
+                if (figure == Figure.whiteArcher && figure2 == Figure.whiteArcher)
+                {
+                    return Figure.whiteArcherArcher;
+                }
+                if (figure == Figure.whiteAssasin && figure2 == Figure.whiteAssasin)
+                {
+                    return Figure.whiteAssasinAssasin;
+                }
+                if ((figure == Figure.whiteArcher && figure2 == Figure.whiteWarrior) || (figure == Figure.whiteWarrior && figure2 == Figure.whiteArcher))
+                {
+                    return Figure.whiteWarriorArcher;
+                }
+                if ((figure == Figure.whiteAssasin && figure2 == Figure.whiteWarrior) || (figure == Figure.whiteWarrior && figure2 == Figure.whiteAssasin))
+                {
+                    return Figure.whiteWarriorAssasin;
+                }
+                if ((figure == Figure.whiteAssasin && figure2 == Figure.whiteArcher) || (figure == Figure.whiteArcher && figure2 == Figure.whiteAssasin))
+                {
+                    return Figure.whiteArcherAssasin;
+                }
+                if ((figure == Figure.whiteWarriorWarrior && figure2==Figure.whiteWarrior) || (figure == Figure.whiteWarrior && figure2 == Figure.whiteWarriorWarrior))
+                {
+                    return Figure.whiteWarriorWarriorWarrior;
+                }
+                if ((figure == Figure.whiteArcherArcher && figure2 == Figure.whiteArcher) || (figure == Figure.whiteArcher && figure2 == Figure.whiteArcherArcher))
+                {
+                    return Figure.whiteArcherArcherArcher;
+                }
+                if ((figure == Figure.whiteAssasinAssasin && figure2 == Figure.whiteAssasin) || (figure == Figure.whiteAssasin && figure2 == Figure.whiteAssasinAssasin))
+                {
+                    return Figure.whiteAssasinAssasinAssasin;
+                }
+                if ((figure == Figure.whiteWarriorArcher && figure2 == Figure.whiteAssasin) || (figure == Figure.whiteArcherAssasin && figure2 == Figure.whiteWarrior) ||
+                    (figure == Figure.whiteWarriorAssasin && figure == Figure.whiteArcher) || (figure2 == Figure.whiteWarriorArcher && figure == Figure.whiteAssasin) ||
+                    (figure2 == Figure.whiteArcherAssasin && figure == Figure.whiteWarrior) ||
+                    (figure2 == Figure.whiteWarriorAssasin && figure == Figure.whiteArcher))
+                {
+                    return Figure.whiteWarriorArcherAssasin;
+                }
+                if ((figure == Figure.whiteWarriorArcher && figure2 == Figure.whiteArcher) || (figure == Figure.whiteArcherArcher && figure2 == Figure.whiteWarrior) ||
+                    (figure2 == Figure.whiteWarriorArcher && figure == Figure.whiteArcher) || (figure2 == Figure.whiteArcherArcher && figure == Figure.whiteWarrior))
+                {
+                    return Figure.whiteWarriorArcherArcher;
+                }
+                if ((figure == Figure.whiteWarriorAssasin && figure2 == Figure.whiteAssasin) || (figure == Figure.whiteAssasinAssasin && figure2 == Figure.whiteWarrior) ||
+                    (figure2 == Figure.whiteWarriorAssasin && figure == Figure.whiteAssasin) || (figure2 == Figure.whiteAssasinAssasin && figure == Figure.whiteWarrior))
+                {
+                    return Figure.whiteWarriorAssasinAssasin;
+                }
+                if ((figure == Figure.whiteWarriorWarrior && figure2 == Figure.whiteArcher) || (figure == Figure.whiteWarriorArcher && figure2 == Figure.whiteWarrior) ||
+                    (figure2 == Figure.whiteWarriorWarrior && figure == Figure.whiteArcher) || (figure2 == Figure.whiteWarriorArcher && figure == Figure.whiteWarrior))
+                {
+                    return Figure.whiteWarriorWarriorArcher;
+                }
+                if ((figure == Figure.whiteWarriorWarrior && figure2 == Figure.whiteAssasin) || (figure == Figure.whiteWarriorAssasin && figure2 == Figure.whiteWarrior) ||
+                (figure2 == Figure.whiteWarriorWarrior && figure == Figure.whiteAssasin) || (figure2 == Figure.whiteWarriorAssasin && figure == Figure.whiteWarrior))
+                {
+                    return Figure.whiteWarriorWarriorAssasin;
+                }
+                if ((figure == Figure.whiteAssasinAssasin && figure2 == Figure.whiteArcher) || (figure == Figure.whiteArcherAssasin && figure2 == Figure.whiteAssasin) ||
+                    (figure2 == Figure.whiteAssasinAssasin && figure == Figure.whiteArcher) || (figure2 == Figure.whiteArcherAssasin && figure == Figure.whiteAssasin))
+                {
+                    return Figure.whiteArcherAssasinAssasin;
+                }
+                if ((figure == Figure.whiteArcherArcher && figure2 == Figure.whiteAssasin) || (figure == Figure.whiteArcherAssasin && figure2 == Figure.whiteArcher) ||
+                    (figure2 == Figure.whiteArcherArcher && figure == Figure.whiteAssasin) || (figure2 == Figure.whiteArcherAssasin && figure == Figure.whiteArcher))
+                {
+                    return Figure.whiteArcherArcherAssasin;
+                }
+            }
+            if(figure.GetColor()==Color.black && figure2.GetColor()==Color.black)
+            {
+                if (figure == Figure.blackWarrior && figure2 == Figure.blackWarrior)
+                {
+                    return Figure.blackWarriorWarrior;
+                }
+                if (figure == Figure.blackArcher && figure2 == Figure.blackArcher)
+                {
+                    return Figure.blackArcherArcher;
+                }
+                if (figure == Figure.blackAssasin && figure2 == Figure.blackAssasin)
+                {
+                    return Figure.blackAssasinAssasin;
+                }
+                if ((figure == Figure.blackArcher && figure2 == Figure.blackWarrior) || (figure == Figure.blackWarrior && figure2 == Figure.blackArcher))
+                {
+                    return Figure.blackWarriorArcher;
+                }
+                if ((figure == Figure.blackAssasin && figure2 == Figure.blackWarrior) || (figure == Figure.blackWarrior && figure2 == Figure.blackAssasin))
+                {
+                    return Figure.blackWarriorAssasin;
+                }
+                if ((figure == Figure.blackAssasin && figure2 == Figure.blackArcher) || (figure == Figure.blackArcher && figure2 == Figure.blackAssasin))
+                {
+                    return Figure.blackArcherAssasin;
+                }
+                if ((figure == Figure.blackWarriorWarrior && figure2 == Figure.blackWarrior) || (figure == Figure.blackWarrior && figure2 == Figure.blackWarriorWarrior))
+                {
+                    return Figure.blackWarriorWarriorWarrior;
+                }
+                if ((figure == Figure.blackArcherArcher && figure2 == Figure.blackArcher) || (figure == Figure.blackArcher && figure2 == Figure.blackArcherArcher))
+                {
+                    return Figure.blackArcherArcherArcher;
+                }
+                if ((figure == Figure.blackAssasinAssasin && figure2 == Figure.blackAssasin) || (figure == Figure.blackAssasin && figure2 == Figure.blackAssasinAssasin))
+                {
+                    return Figure.blackAssasinAssasinAssasin;
+                }
+                if ((figure == Figure.blackWarriorArcher && figure2 == Figure.blackAssasin) || (figure == Figure.blackArcherAssasin && figure2 == Figure.blackWarrior) ||
+                    (figure == Figure.blackWarriorAssasin && figure == Figure.blackArcher) || (figure2 == Figure.blackWarriorArcher && figure == Figure.blackAssasin) ||
+                    (figure2 == Figure.blackArcherAssasin && figure == Figure.blackWarrior) ||
+                    (figure2 == Figure.blackWarriorAssasin && figure == Figure.blackArcher))
+                {
+                    return Figure.blackWarriorArcherAssasin;
+                }
+                if ((figure == Figure.blackWarriorArcher && figure2 == Figure.blackArcher) || (figure == Figure.blackArcherArcher && figure2 == Figure.blackWarrior) ||
+                    (figure2 == Figure.blackWarriorArcher && figure == Figure.blackArcher) || (figure2 == Figure.blackArcherArcher && figure == Figure.blackWarrior))
+                {
+                    return Figure.blackWarriorArcherArcher;
+                }
+                if ((figure == Figure.blackWarriorAssasin && figure2 == Figure.blackAssasin) || (figure == Figure.blackAssasinAssasin && figure2 == Figure.blackWarrior) ||
+                    (figure2 == Figure.whiteWarriorAssasin && figure == Figure.blackAssasin) || (figure2 == Figure.blackAssasinAssasin && figure == Figure.blackWarrior))
+                {
+                    return Figure.blackWarriorAssasinAssasin;
+                }
+                if ((figure == Figure.blackWarriorWarrior && figure2 == Figure.blackArcher) || (figure == Figure.blackWarriorArcher && figure2 == Figure.blackWarrior) ||
+                    (figure2 == Figure.blackWarriorWarrior && figure == Figure.blackArcher) || (figure2 == Figure.blackWarriorArcher && figure == Figure.blackWarrior))
+                {
+                    return Figure.blackWarriorWarriorArcher;
+                }
+                if ((figure == Figure.blackWarriorWarrior && figure2 == Figure.blackAssasin) || (figure == Figure.blackWarriorAssasin && figure2 == Figure.blackWarrior) ||
+                (figure2 == Figure.blackWarriorWarrior && figure == Figure.blackAssasin) || (figure2 == Figure.blackWarriorAssasin && figure == Figure.blackWarrior))
+                {
+                    return Figure.blackWarriorWarriorAssasin;
+                }
+                if ((figure == Figure.blackAssasinAssasin && figure2 == Figure.blackArcher) || (figure == Figure.blackArcherAssasin && figure2 == Figure.blackAssasin) ||
+                    (figure2 == Figure.blackAssasinAssasin && figure == Figure.blackArcher) || (figure2 == Figure.blackArcherAssasin && figure == Figure.blackAssasin))
+                {
+                    return Figure.blackArcherAssasinAssasin;
+                }
+                if ((figure == Figure.blackArcherArcher && figure2 == Figure.blackAssasin) || (figure == Figure.blackArcherAssasin && figure2 == Figure.blackArcher) ||
+                    (figure2 == Figure.blackArcherArcher && figure == Figure.blackAssasin) || (figure2 == Figure.blackArcherAssasin && figure == Figure.blackArcher))
+                {
+                    return Figure.blackArcherArcherAssasin;
+                }
+            }
+            return Figure.none;
+        }
+    }
+}
